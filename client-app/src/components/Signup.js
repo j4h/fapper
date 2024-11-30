@@ -1,62 +1,69 @@
 import React, { useState } from 'react';
-import api from '../api'; // Import the Axios instance
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import './Signup.css'; // Import the CSS file
+import api from '../api';
+import { useNavigate } from 'react-router-dom';
+import { Button, TextField, Typography, Container, Box } from '@mui/material';
+import './Signup.css';
 
 function Signup() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize useNavigate
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post('/auth/register', { username, email, password });
+            navigate('/login');
+        } catch (error) {
+            setError('Signup failed. Please try again.');
+        }
+    };
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setLoading(true); // Start loading
-    try {
-      const response = await api.post('/auth/register', { username, email, password });
-      console.log('Signup successful', response.data);
-      navigate('/login'); // Redirect to login after successful signup
-    } catch (error) {
-      setError('Signup failed. Please try again.');
-      console.error('Signup failed', error);
-    } finally {
-      setLoading(false); // Stop loading
-    }
-  };
-
-  return (
-    <div className="signup-container">
-      <h2>Signup</h2>
-      <form onSubmit={handleSignup}>
-        <input 
-          type="text" 
-          placeholder="Username" 
-          value={username} 
-          onChange={(e) => setUsername(e.target.value)} 
-          required 
-        />
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
-        />
-        {loading ? <p>Loading...</p> : <button type="submit">Signup</button>}
-        {error && <p className="error">{error}</p>}
-      </form>
-    </div>
-  );
+    return (
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 5 }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Signup
+                </Typography>
+                <form onSubmit={handleSignup}>
+                    <TextField
+                        label="Username"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        label="Password"
+                        type="password"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <Button type="submit" variant="contained" color="primary" fullWidth>
+                        Signup
+                    </Button>
+                    {error && <Typography color="error">{error}</Typography>}
+                </form>
+            </Box>
+        </Container>
+    );
 }
 
 export default Signup;
